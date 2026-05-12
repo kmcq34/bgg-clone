@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - BoardGameGlobe</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .bubble {
+      position: absolute;
+      bottom: -50px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(100,200,255,0.15));
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      animation: rise linear infinite;
+    }
+    @keyframes rise {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+      100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bubbles">
+    <div class="bubble" style="left:10%;width:35px;height:35px;animation-duration:14s;animation-delay:1s;"></div>
+    <div class="bubble" style="left:30%;width:55px;height:55px;animation-duration:18s;animation-delay:0s;"></div>
+    <div class="bubble" style="left:50%;width:40px;height:40px;animation-duration:16s;animation-delay:3s;"></div>
+    <div class="bubble" style="left:70%;width:28px;height:28px;animation-duration:20s;animation-delay:2s;"></div>
+    <div class="bubble" style="left:90%;width:48px;height:48px;animation-duration:15s;animation-delay:4s;"></div>
+  </div>
+
+  <header>
+    <div class="container">
+      <nav>
+        <a href="/" class="logo">BoardGameGeek</a>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/search">Browse</a></li>
+          <li id="nav-login"><a href="/login">Sign In</a></li>
+          <li id="nav-user" style="display: none;"><a href="#" id="username-link"></a></li>
+          <li id="nav-logout" style="display: none;"><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="login-form">
+        <div id="auth-error" class="error-message" style="display: none;"></div>
+        <div id="auth-success" class="success-message" style="display: none;"></div>
+
+        <ul style="display: flex; list-style: none; margin-bottom: 1.5rem; border-bottom: 2px solid rgba(100, 180, 255, 0.2);">
+          <li><a href="#" id="tab-login" style="flex: 1; text-align: center; border-bottom: 2px solid var(--gloss-blue); padding-bottom: 0.5rem; color: var(--gloss-blue);" onclick="showTab('login')">Sign In</a></li>
+          <li><a href="#" id="tab-register" style="flex: 1; text-align: center; padding-bottom: 0.5rem; color: var(--text-muted);" onclick="showTab('register')">Create Account</a></li>
+        </ul>
+
+        <form id="login-form" onsubmit="login(event)">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="login-username" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </form>
+
+        <form id="register-form" style="display: none;" onsubmit="register(event)">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="register-username" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="register-email" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="register-password" required minlength="6">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>BoardGameGeek Clone &copy; 2026 | Built with Frutiger Aero Aesthetic</p>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>
