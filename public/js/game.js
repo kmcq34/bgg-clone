@@ -20,7 +20,7 @@ async function loadGame() {
 
 function renderGame(data) {
   const { game, reviews, relatedGames } = data;
-  document.title = `${game.name} - BoardGameGeek Clone`;
+  document.title = `${game.name} - BGWiki`;
 
   document.getElementById('game-detail').innerHTML = `
     <div class="game-image">

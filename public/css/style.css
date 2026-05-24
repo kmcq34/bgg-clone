@@ -4,8 +4,8 @@
   --xp-blue-light: #4a9eff;
   --xp-header-from: #2a6fd4;
   --xp-header-to: #1a4fa0;
-  --xp-link: #0066cc;
-  --xp-link-visited: #800080;
+  --xp-link: #ffffff;
+  --xp-link-visited: #ffffff;
   --xp-link-hover: #ff6600;
   --bg-page: #d4e6f5;
   --white-card: #f8faff;
@@ -87,16 +87,16 @@ nav {
 
 .logo {
   font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
-  color: #ffffff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  color: #ffdd44;
+  text-shadow: 2px 2px 3px rgba(0,0,0,0.8);
   text-decoration: none !important;
   letter-spacing: 0.5px;
 }
 
 .logo:hover {
-  color: #ffffcc;
+  color: #ffee88;
   text-decoration: none !important;
 }
 

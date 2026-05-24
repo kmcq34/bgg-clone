@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In - BoardGameGeek</title>
+  <title>Sign In - BGWiki</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <header>
     <div class="container">
       <nav>
-        <a href="/" class="logo">BoardGameGeek</a>
+        <a href="/" class="logo">BGWiki</a>
         <ul>
           <li><a href="/">Home</a></li>
           <li><a href="/search">Browse</a></li>
@@ -29,9 +29,10 @@
         <div id="auth-error" class="error-message" style="display: none;"></div>
         <div id="auth-success" class="success-message" style="display: none;"></div>
 
-        <ul style="display: flex; list-style: none; margin-bottom: 1.5rem; border-bottom: 2px solid rgba(100, 180, 255, 0.2);">
-          <li><a href="#" id="tab-login" style="flex: 1; text-align: center; border-bottom: 2px solid var(--gloss-blue); padding-bottom: 0.5rem; color: var(--gloss-blue);" onclick="showTab('login')">Sign In</a></li>
-          <li><a href="#" id="tab-register" style="flex: 1; text-align: center; padding-bottom: 0.5rem; color: var(--text-muted);" onclick="showTab('register')">Create Account</a></li>
+        <ul style="display: flex; list-style: none; margin-bottom: 1.5rem; border-bottom: 2px solid rgba(100, 180, 255, 0.2); align-items: center;">
+          <li style="flex:1;"><a href="#" id="tab-login" style="display:block;text-align:center;border-bottom:2px solid var(--gloss-blue);padding-bottom:0.5rem;color:var(--gloss-blue);" onclick="showTab('login')">Sign In</a></li>
+          <li style="padding:0 8px;color:var(--text-muted);font-size:11px;font-weight:bold;">or</li>
+          <li style="flex:1;"><a href="#" id="tab-register" style="display:block;text-align:center;padding-bottom:0.5rem;color:var(--text-muted);" onclick="showTab('register')">Create Account</a></li>
         </ul>
 
         <form id="login-form" onsubmit="login(event)">
@@ -67,7 +68,7 @@
 
   <footer>
     <div class="container">
-      <p>BoardGameGeek Clone &copy; 2026</p>
+      <p>BGWiki &copy; 2026 &middot; <a href="https://github.com/kmcq34/bgg-clone" style="color:var(--text-muted);">GitHub</a></p>
     </div>
   </footer>
 

@@ -52,7 +52,7 @@ function makeSvg(name, cat, year, c1, c2) {
   ${textLines}
   <text x="150" y="220" fill="rgba(255,255,255,0.7)" font-family="Trebuchet MS,sans-serif" font-size="14" text-anchor="middle">${cat}</text>
   ${year ? `<text x="150" y="250" fill="rgba(255,255,255,0.5)" font-family="Trebuchet MS,sans-serif" font-size="12" text-anchor="middle">${year}</text>` : ''}
-  <text x="150" y="370" fill="rgba(255,255,255,0.25)" font-family="Trebuchet MS,sans-serif" font-size="10" text-anchor="middle">BoardGameGeek</text>
+  <text x="150" y="370" fill="rgba(255,255,255,0.25)" font-family="Trebuchet MS,sans-serif" font-size="10" text-anchor="middle">BGWiki</text>
 </svg>`;
 }
 
