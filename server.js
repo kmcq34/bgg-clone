@@ -12,6 +12,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const requireDbInit = require('./database');
 
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -26,6 +28,10 @@ app.get('/search', (req, res) => {
 
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/add-game', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'add-game.html'));
 });
 
 app.get('/api/games', (req, res) => {
@@ -83,6 +89,35 @@ app.get('/api/games/:id', (req, res) => {
   `).all(req.params.id, `%${game.category.split(',')[0]}%`, `%${game.category.split(',')[1] || ''}%`);
 
   res.json({ game, reviews, relatedGames });
+});
+
+app.post('/api/games', (req, res) => {
+  const { name, description, min_players, max_players, play_time, min_age, complexity, year_published, designer, publisher, category, mechanism, image_url } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Game name is required' });
+  }
+
+  const img = (image_url && image_url.trim())
+    ? image_url.trim()
+    : db.generateImagePlaceholder(name, year_published || new Date().getFullYear(), category || '');
+
+  try {
+    const result = db.prepare(`
+      INSERT INTO games (name, description, min_players, max_players, play_time, min_age, complexity, year_published, designer, publisher, category, mechanism, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      name, description || '',
+      parseInt(min_players) || 1, parseInt(max_players) || 4,
+      parseInt(play_time) || 30, parseInt(min_age) || 8,
+      parseFloat(complexity) || 1, parseInt(year_published) || new Date().getFullYear(),
+      designer || '', publisher || '', category || '', mechanism || '', img
+    );
+
+    res.json({ success: true, gameId: result.lastInsertRowid });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add game: ' + err.message });
+  }
 });
 
 app.post('/api/register', (req, res) => {
@@ -299,6 +334,15 @@ app.get('/api/categories', (req, res) => {
   res.json(categories);
 });
 
-app.listen(PORT, () => {
-  console.log(`BoardGameGeek Clone running at http://localhost:${PORT}`);
+const os = require('os');
+const ifaces = os.networkInterfaces();
+let ip = 'localhost';
+Object.values(ifaces).forEach(iface => {
+  iface.forEach(addr => { if (addr.family === 'IPv4' && !addr.internal) ip = addr.address; });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`BoardGameGeek Clone running at:`);
+  console.log(`  Local:   http://localhost:${PORT}`);
+  console.log(`  Network: http://${ip}:${PORT}`);
 });

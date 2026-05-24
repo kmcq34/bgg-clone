@@ -1,14 +1,14 @@
 const propositionLabels = {
-  topRated: { label: 'Highest Rated', icon: '\u2B50', tag: 'Top Pick', tagClass: '' },
-  gatewayGames: { label: 'Great for Beginners', icon: '\uD83C\uDF31', tag: 'Easy to Learn', tagClass: '' },
-  heavyGames: { label: 'For Strategy Masters', icon: '\uD83C\uDFAF', tag: 'Deep Strategy', tagClass: 'purple' },
-  soloGames: { label: 'Perfect for Solo Play', icon: '\uD83E\uDDD8', tag: 'Solo Friendly', tagClass: 'blue' },
-  partyGames: { label: 'Game Night Favorites', icon: '\uD83C\uDF89', tag: 'Party Ready', tagClass: 'orange' },
-  quickGames: { label: 'Quick Sessions', icon: '\u23F1\uFE0F', tag: 'Under 45min', tagClass: '' },
-  hiddenGems: { label: 'Hidden Gems', icon: '\uD83D\uDC8E', tag: 'Underrated', tagClass: 'purple' },
-  strategyGames: { label: 'Engine Builders', icon: '\u2699\uFE0F', tag: 'Strategy', tagClass: 'blue' },
-  coOpGames: { label: 'Work Together', icon: '\uD83E\uDD1D', tag: 'Cooperative', tagClass: '' },
-  basedOnCollection: { label: 'Based on Your Collection', icon: '\uD83D\uDCDA', tag: 'For You', tagClass: '' }
+  topRated: { label: 'Highest Rated', icon: '', tag: 'Top Pick', tagClass: '' },
+  gatewayGames: { label: 'Great for Beginners', icon: '', tag: 'Easy to Learn', tagClass: '' },
+  heavyGames: { label: 'For Strategy Masters', icon: '', tag: 'Deep Strategy', tagClass: 'purple' },
+  soloGames: { label: 'Perfect for Solo Play', icon: '', tag: 'Solo Friendly', tagClass: 'blue' },
+  partyGames: { label: 'Game Night Favorites', icon: '', tag: 'Party Ready', tagClass: 'orange' },
+  quickGames: { label: 'Quick Sessions', icon: '', tag: 'Under 45min', tagClass: '' },
+  hiddenGems: { label: 'Hidden Gems', icon: '', tag: 'Underrated', tagClass: 'purple' },
+  strategyGames: { label: 'Engine Builders', icon: '', tag: 'Strategy', tagClass: 'blue' },
+  coOpGames: { label: 'Work Together', icon: '', tag: 'Cooperative', tagClass: '' },
+  basedOnCollection: { label: 'Based on Your Collection', icon: '', tag: 'For You', tagClass: '' }
 };
 
 let activeCategory = '';
@@ -132,24 +132,24 @@ function renderRecommendations(propositions) {
     html += `
       <div class="proposition-section">
         <div class="proposition-header">
-          <h2><span class="icon">${config.icon}</span> ${config.label}</h2>
+          <h2>${config.label}</h2>
         </div>
         <div class="proposition-scroll">
           ${games.map(game => `
-            <div class="proposition-card">
-              <img src="${game.image_url}" alt="${game.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22160%22><rect fill=%22%23e0f0ff%22 width=%22240%22 height=%22160%22/><text fill=%22%230078d7%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 font-size=%2214%22>${encodeURIComponent(game.name)}</text></svg>'">
+            <a href="/game?id=${game.id}" class="proposition-card" style="text-decoration:none;color:inherit;display:block;">
+              <img src="${game.image_url}" alt="${game.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22120%22><rect fill=%22%23e0f0ff%22 width=%22200%22 height=%22120%22/><text fill=%22%230078d7%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 font-size=%2212%22>${encodeURIComponent(game.name)}</text></svg>'">
               <div class="proposition-card-content">
                 <span class="proposition-tag ${config.tagClass}">${config.tag}</span>
-                <h4><a href="/game?id=${game.id}">${game.name}</a></h4>
+                <h4>${game.name}</h4>
                 <div class="game-rating">
                   ${getRatingBadge(game.avg_rating)}
                   <span style="font-size: 0.8rem; color: var(--text-muted);">${game.total_ratings} ratings</span>
                 </div>
                 <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
-                  ${game.min_players}-${game.max_players} players \u00B7 ${game.play_time}min
+                  ${game.min_players}-${game.max_players} players · ${game.play_time}min
                 </div>
               </div>
-            </div>
+            </a>
           `).join('')}
         </div>
       </div>
@@ -166,6 +166,12 @@ if (initialQuery) {
 }
 
 loadCategories();
+
+let searchTimeout;
+document.getElementById('search-input').addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(searchGames, 300);
+});
 
 document.getElementById('search-input').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') searchGames();

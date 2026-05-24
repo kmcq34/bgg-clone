@@ -6,214 +6,80 @@
   <title>Browse Games - BoardGameGeek</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .bubbles {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: -1;
-      overflow: hidden;
-    }
-    .bubble {
-      position: absolute;
-      bottom: -50px;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(100,200,255,0.15));
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      animation: rise linear infinite;
-    }
-    @keyframes rise {
-      0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
-      100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
-    }
-
     .category-chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-      padding: 1.2rem;
-      background: var(--card-bg);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--glass-border);
+      gap: 4px;
+      margin-bottom: 12px;
+      padding: 8px 10px;
+      background: linear-gradient(180deg, #eaf2f8 0%, #d8e6f2 100%);
+      border: 2px outset var(--border-light);
     }
-
     .chip {
-      padding: 0.4rem 1rem;
-      background: linear-gradient(180deg, #f0f8ff 0%, #e0f0ff 100%);
-      border: 2px solid rgba(100, 180, 255, 0.3);
-      border-radius: 25px;
+      padding: 2px 10px;
+      border: 1px solid var(--border-light);
+      background: linear-gradient(180deg, #f0f6fc 0%, #dce6f0 100%);
       cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      transition: all 0.2s;
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-body);
+      font-family: 'Trebuchet MS', sans-serif;
     }
-
     .chip:hover {
-      background: linear-gradient(180deg, #d0e8ff 0%, #b0d4ff 100%);
-      border-color: var(--gloss-blue);
-      transform: translateY(-2px);
+      background: linear-gradient(180deg, #e0ecf8 0%, #c8daf0 100%);
     }
-
     .chip.active {
-      background: linear-gradient(180deg, #88e066 0%, #3da35d 100%);
+      background: linear-gradient(180deg, #5fad5f 0%, #2d7a2d 100%);
       color: white;
-      border-color: var(--leaf-green);
-      box-shadow: 0 0 12px rgba(61, 163, 93, 0.3);
+      border-color: #2a6a2a;
     }
-
     .chip .count {
-      font-size: 0.75rem;
-      opacity: 0.8;
-      margin-left: 0.3rem;
+      font-size: 10px;
+      opacity: 0.7;
     }
-
     .proposition-section {
-      margin-bottom: 2.5rem;
+      margin-bottom: 16px;
     }
-
-    .proposition-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-
     .proposition-header h2 {
-      font-size: 1.3rem;
-      color: var(--gloss-blue);
-      font-weight: 700;
+      font-family: 'Georgia', serif;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--text-heading);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 4px;
     }
-
-    .proposition-header .icon {
-      font-size: 1.4rem;
-    }
-
     .proposition-scroll {
       display: flex;
-      gap: 1rem;
+      gap: 8px;
       overflow-x: auto;
-      padding-bottom: 1rem;
-      scroll-snap-type: x mandatory;
+      padding-bottom: 8px;
     }
-
-    .proposition-scroll::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    .proposition-scroll::-webkit-scrollbar-track {
-      background: rgba(100, 180, 255, 0.1);
-      border-radius: 10px;
-    }
-
-    .proposition-scroll::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #88e066 0%, #3da35d 100%);
-      border-radius: 10px;
-    }
-
-    .proposition-card {
-      min-width: 240px;
-      max-width: 240px;
-      background: var(--card-bg);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
-      transition: all 0.3s;
-      scroll-snap-align: start;
-      flex-shrink: 0;
-    }
-
-    .proposition-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 35px rgba(0, 100, 180, 0.25), var(--shadow-glow);
-    }
-
-    .proposition-card img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-    }
-
-    .proposition-card-content {
-      padding: 0.8rem;
-    }
-
-    .proposition-card h4 {
-      font-size: 0.95rem;
-      margin-bottom: 0.4rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .proposition-card h4 a {
-      color: var(--text-dark);
-    }
-
-    .proposition-card h4 a:hover {
-      color: var(--gloss-blue);
-    }
-
     .proposition-tag {
       display: inline-block;
-      background: linear-gradient(180deg, #88e066 0%, #3da35d 100%);
+      background: linear-gradient(180deg, #5fad5f 0%, #2d7a2d 100%);
       color: white;
-      padding: 0.2rem 0.5rem;
-      border-radius: 10px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      margin-bottom: 0.4rem;
+      padding: 1px 5px;
+      font-size: 10px;
+      font-weight: bold;
+      border: 1px outset #2a6a2a;
+      margin-bottom: 4px;
     }
-
     .proposition-tag.orange {
-      background: linear-gradient(180deg, #ffb347 0%, #ff9900 100%);
+      background: linear-gradient(180deg, #e8a030 0%, #c07020 100%);
+      border-color: #a06020;
     }
-
     .proposition-tag.blue {
-      background: linear-gradient(180deg, #4da6ff 0%, #0078d7 100%);
+      background: linear-gradient(180deg, #4a8ed4 0%, #1a5ca8 100%);
+      border-color: #1a4a80;
     }
-
     .proposition-tag.purple {
-      background: linear-gradient(180deg, #b48eff 0%, #7b4dff 100%);
-    }
-
-    .search-layout {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-
-    .search-results-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    @media (min-width: 768px) {
-      .search-layout {
-        grid-template-columns: 1fr;
-      }
+      background: linear-gradient(180deg, #8a6ad0 0%, #5a3aa0 100%);
+      border-color: #4a2a80;
     }
   </style>
 </head>
 <body>
-  <div class="bubbles">
-    <div class="bubble" style="left:12%;width:50px;height:50px;animation-duration:15s;animation-delay:0s;"></div>
-    <div class="bubble" style="left:35%;width:32px;height:32px;animation-duration:19s;animation-delay:2s;"></div>
-    <div class="bubble" style="left:58%;width:44px;height:44px;animation-duration:16s;animation-delay:1s;"></div>
-    <div class="bubble" style="left:78%;width:38px;height:38px;animation-duration:21s;animation-delay:3s;"></div>
-    <div class="bubble" style="left:95%;width:26px;height:26px;animation-duration:17s;animation-delay:4s;"></div>
-  </div>
-
   <header>
     <div class="container">
       <nav>
@@ -221,6 +87,7 @@
         <ul>
           <li><a href="/">Home</a></li>
           <li><a href="/search">Browse</a></li>
+          <li><a href="/add-game">Add Game</a></li>
           <li id="nav-login"><a href="/login">Sign In</a></li>
           <li id="nav-user" style="display: none;"><a href="#" id="username-link"></a></li>
           <li id="nav-logout" style="display: none;"><a href="#" onclick="logout()">Logout</a></li>
@@ -256,9 +123,9 @@
         </select>
         <select id="complexity-filter">
           <option value="">Any Complexity</option>
-          <option value="2">Light (<=2)</option>
-          <option value="3">Medium (<=3)</option>
-          <option value="4">Heavy (<=4)</option>
+          <option value="2">Light &lt;=2</option>
+          <option value="3">Medium &lt;=3</option>
+          <option value="4">Heavy &lt;=4</option>
         </select>
         <button class="btn btn-primary" onclick="searchGames()">Search</button>
       </div>
@@ -271,7 +138,7 @@
 
   <footer>
     <div class="container">
-      <p>BoardGameGeek Clone &copy; 2026 | Built with Frutiger Aero Aesthetic</p>
+      <p>BoardGameGeek Clone &copy; 2026</p>
     </div>
   </footer>
 

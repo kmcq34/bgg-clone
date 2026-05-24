@@ -43,6 +43,69 @@ function quickSearch(event) {
   if (query) {
     window.location.href = `/search?q=${encodeURIComponent(query)}`;
   }
+  hideSuggestions();
+}
+
+let suggestTimeout;
+function setupLiveSearch() {
+  const searchForm = document.querySelector('.search-bar');
+  if (!searchForm) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'search-bar-wrap';
+  searchForm.parentNode.insertBefore(wrap, searchForm);
+  wrap.appendChild(searchForm);
+
+  const sugg = document.createElement('div');
+  sugg.className = 'search-suggestions';
+  sugg.id = 'search-suggestions';
+  wrap.appendChild(sugg);
+
+  const input = document.getElementById('quick-search-input');
+  if (!input) return;
+
+  input.addEventListener('input', () => {
+    clearTimeout(suggestTimeout);
+    const q = input.value.trim();
+    if (q.length < 1) { hideSuggestions(); return; }
+    suggestTimeout = setTimeout(() => fetchSuggestions(q), 250);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hideSuggestions();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-bar-wrap')) hideSuggestions();
+  });
+}
+
+async function fetchSuggestions(query) {
+  try {
+    const res = await fetch(`${API_URL}/api/games?limit=8&sort=name`);
+    const data = await res.json();
+    const filtered = data.games.filter(g =>
+      g.name.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 8);
+    renderSuggestions(filtered);
+  } catch { hideSuggestions(); }
+}
+
+function renderSuggestions(games) {
+  const container = document.getElementById('search-suggestions');
+  if (!games.length) { hideSuggestions(); return; }
+  container.innerHTML = games.map(g => `
+    <a href="/game?id=${g.id}" class="search-suggestion-item">
+      <div class="suggestion-name">${g.name}</div>
+      <div class="suggestion-meta">${g.min_players}-${g.max_players} players &middot; ${g.play_time}min &middot; ${g.category ? g.category.split(',')[0] : ''}</div>
+    </a>
+  `).join('');
+  container.classList.add('open');
+}
+
+function hideSuggestions() {
+  const container = document.getElementById('search-suggestions');
+  if (container) container.classList.remove('open');
 }
 
 function formatRating(rating) {
@@ -60,10 +123,10 @@ function getRatingBadge(rating) {
 
 function createGameCard(game) {
   return `
-    <div class="game-card">
-      <img src="${game.image_url}" alt="${game.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22><rect fill=%22%231a1a2e%22 width=%22300%22 height=%22200%22/><text fill=%22%23ff9900%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22>${encodeURIComponent(game.name)}</text></svg>'">
+    <a href="/game?id=${game.id}" class="game-card" style="text-decoration:none;color:inherit;display:block;">
+      <img src="${game.image_url}" alt="${game.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22><rect fill=%22%23e0f0ff%22 width=%22300%22 height=%22200%22/><text fill=%22%230078d7%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 font-size=%2216%22>${encodeURIComponent(game.name)}</text></svg>'">
       <div class="game-card-content">
-        <h3><a href="/game?id=${game.id}">${game.name}</a></h3>
+        <h3>${game.name}</h3>
         <div class="game-meta">
           <span>${game.min_players}-${game.max_players} players</span>
           <span>${game.play_time} min</span>
@@ -76,9 +139,10 @@ function createGameCard(game) {
           ${game.category ? game.category.split(',').slice(0, 3).map(c => `<span class="tag">${c.trim()}</span>`).join('') : ''}
         </div>
       </div>
-    </div>
+    </a>
   `;
 }
 
 checkAuth();
 updateNav();
+setupLiveSearch();

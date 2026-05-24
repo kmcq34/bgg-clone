@@ -71,6 +71,55 @@ function initDb() {
   }
 }
 
+function splitText(text, maxLen) {
+  if (text.length <= maxLen) return [text];
+  const mid = Math.floor(text.length / 2);
+  let splitAt = -1;
+  for (let i = mid; i < text.length; i++) { if (text[i] === ' ') { splitAt = i; break; } }
+  if (splitAt === -1) { for (let i = mid; i >= 0; i--) { if (text[i] === ' ') { splitAt = i; break; } } }
+  return splitAt > 0 ? [text.substring(0, splitAt), text.substring(splitAt + 1)] : [text];
+}
+
+function generateImagePlaceholder(name, year, category) {
+  const colors = [
+    ['#1a3a5c', '#4a8ed4'], ['#3a1a5c', '#8a4ed4'], ['#1a5c3a', '#4ad48a'],
+    ['#5c3a1a', '#d48a4a'], ['#5c1a2a', '#d44a6a'], ['#2a5c1a', '#6ad44a'],
+    ['#1a4a5c', '#4a8ad4'], ['#5c4a1a', '#d4aa4a'], ['#3a5c4a', '#6ad48a'],
+    ['#4a1a5c', '#aa4ad4'], ['#5c2a1a', '#d47a4a'], ['#1a5c5c', '#4ad4d4'],
+    ['#2a1a5c', '#6a4ad4'], ['#5c1a4a', '#d44aaa'], ['#1a3a3a', '#4a8a8a'],
+    ['#4a5c1a', '#aad44a'], ['#5c3a3a', '#d48a8a'], ['#1a2a5c', '#4a6ad4'],
+    ['#3a5c1a', '#7ad44a'], ['#5c1a1a', '#d44a4a']
+  ];
+  const idx = [...name].reduce((a, c) => a + c.charCodeAt(0), 0) % colors.length;
+  const [c1, c2] = colors[idx];
+  const safeName = name.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const cat = (category || 'Board Game').replace(/&/g, '&amp;');
+  const lines = splitText(safeName, 18);
+  const fs = lines.length > 1 ? 16 : 22;
+  const lineH = fs + 4;
+  const totalH = lines.length * lineH;
+  const startY = 160 + (40 - totalH) / 2;
+  const textLines = lines.map((line, i) =>
+    `<text x="150" y="${startY + i * lineH}" fill="white" font-family="Georgia,serif" font-size="${fs}" font-weight="bold" text-anchor="middle" text-decoration="underline">${line}</text>`
+  ).join('\n  ');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:${c1}"/>
+      <stop offset="100%" style="stop-color:${c2}"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="400" fill="url(#bg)"/>
+  <rect x="20" y="20" width="260" height="360" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <rect x="25" y="25" width="250" height="350" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  ${textLines}
+  <text x="150" y="220" fill="rgba(255,255,255,0.7)" font-family="Trebuchet MS,sans-serif" font-size="14" text-anchor="middle">${cat}</text>
+  ${year ? `<text x="150" y="250" fill="rgba(255,255,255,0.5)" font-family="Trebuchet MS,sans-serif" font-size="12" text-anchor="middle">${year}</text>` : ''}
+  <text x="150" y="370" fill="rgba(255,255,255,0.25)" font-family="Trebuchet MS,sans-serif" font-size="10" text-anchor="middle">BoardGameGeek</text>
+</svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
 function seedData() {
   const insertUser = db.prepare('INSERT OR IGNORE INTO users (username, email, password) VALUES (?, ?, ?)');
   const hashedPw = bcrypt.hashSync('password123', 10);
@@ -86,7 +135,6 @@ function seedData() {
       complexity: 3.9, year_published: 2017, designer: 'Isaac Childres',
       publisher: 'Cephalofair Games', category: 'Fantasy, Adventure',
       mechanism: 'Action Selection, Card Drafting, Grid Movement',
-      image_url: 'https://cf.geekdo-images.com/1rBdkTqCAwW40lYbCRAa0t5i0b8=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic3721244.jpg'
     },
     {
       name: 'Brass: Birmingham',
@@ -95,7 +143,6 @@ function seedData() {
       complexity: 3.9, year_published: 2018, designer: 'Gavan Brown, Matt Tolman, Rustan Håkansson',
       publisher: 'Roxley', category: 'Economic, Industry',
       mechanism: 'Network Building, Hand Management, Action Points',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic4312002.jpg'
     },
     {
       name: 'Pandemic Legacy: Season 1',
@@ -104,7 +151,6 @@ function seedData() {
       complexity: 2.8, year_published: 2015, designer: 'Rob Daviau, Matt Leacock',
       publisher: 'Z-Man Games', category: 'Cooperative, Legacy',
       mechanism: 'Cooperative, Point to Point, Hand Management',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic1810236.jpg'
     },
     {
       name: 'Terraforming Mars',
@@ -113,7 +159,6 @@ function seedData() {
       complexity: 3.2, year_published: 2016, designer: 'Jacob Fryxelius',
       publisher: 'FryxGames', category: 'Economic, Science Fiction',
       mechanism: 'Card Drafting, Engine Building, Open Drafting',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic2410648.jpg'
     },
     {
       name: 'Twilight Imperium: Fourth Edition',
@@ -122,7 +167,6 @@ function seedData() {
       complexity: 4.3, year_published: 2017, designer: 'Christian T. Petersen',
       publisher: 'Fantasy Flight Games', category: 'Science Fiction, Strategy',
       mechanism: 'Area Control, Voting, Trading, Dice Rolling',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic3508400.jpg'
     },
     {
       name: 'Wingspan',
@@ -131,7 +175,6 @@ function seedData() {
       complexity: 2.5, year_published: 2019, designer: 'Elizabeth Hargrave',
       publisher: 'Stonemaier Games', category: 'Animals, Card Game',
       mechanism: 'Engine Building, Card Drafting, Dice Placement',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic4419536.jpg'
     },
     {
       name: 'Scythe',
@@ -140,7 +183,6 @@ function seedData() {
       complexity: 3.5, year_published: 2016, designer: 'Jamey Stegmaier',
       publisher: 'Stonemaier Games', category: 'Strategy, Alternate History',
       mechanism: 'Action Selection, Area Control, Engine Building',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic2729043.jpg'
     },
     {
       name: 'Spirit Island',
@@ -149,7 +191,6 @@ function seedData() {
       complexity: 4.1, year_published: 2017, designer: 'R. Eric Reuss',
       publisher: 'Greater Than Games', category: 'Cooperative, Fantasy',
       mechanism: 'Cooperative, Action Points, Card Play',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic3548400.jpg'
     },
     {
       name: 'Catan',
@@ -158,7 +199,6 @@ function seedData() {
       complexity: 2.3, year_published: 1995, designer: 'Klaus Teuber',
       publisher: 'KOSMOS', category: 'Economic, Negotiation',
       mechanism: 'Dice Rolling, Trading, Modular Board',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic4419536.jpg'
     },
     {
       name: 'Ticket to Ride',
@@ -167,7 +207,6 @@ function seedData() {
       complexity: 1.8, year_published: 2004, designer: 'Alan R. Moon',
       publisher: 'Days of Wonder', category: 'Travel, Trains',
       mechanism: 'Set Collection, Route Building, Card Drafting',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic3269950.jpg'
     },
     {
       name: '7 Wonders',
@@ -176,7 +215,6 @@ function seedData() {
       complexity: 2.3, year_published: 2010, designer: 'Antoine Bauza',
       publisher: 'Repos Production', category: 'Civilization, Card Game',
       mechanism: 'Card Drafting, Hand Management, Set Collection',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic674762.jpg'
     },
     {
       name: 'Azul',
@@ -185,7 +223,6 @@ function seedData() {
       complexity: 1.8, year_published: 2017, designer: 'Michael Kiesling',
       publisher: 'Plan B Games', category: 'Abstract Strategy, Tiles',
       mechanism: 'Tile Placement, Set Collection, Pattern Building',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic3368690.jpg'
     },
     {
       name: 'Everdell',
@@ -194,7 +231,6 @@ function seedData() {
       complexity: 3.0, year_published: 2018, designer: 'James A. Wilson',
       publisher: 'Starling Games', category: 'Animals, Fantasy',
       mechanism: 'Worker Placement, Card Drafting, Engine Building',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic3880424.jpg'
     },
     {
       name: 'Ark Nova',
@@ -203,7 +239,6 @@ function seedData() {
       complexity: 3.7, year_published: 2021, designer: 'Mathias Wigge',
       publisher: 'Feuerland Spiele', category: 'Animals, Zoo',
       mechanism: 'Card Drafting, Engine Building, Worker Placement',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic5963300.jpg'
     },
     {
       name: 'Dune: Imperium',
@@ -212,7 +247,6 @@ function seedData() {
       complexity: 3.2, year_published: 2020, designer: 'Paul Dennen',
       publisher: 'Dire Wolf Digital', category: 'Science Fiction, Deck Building',
       mechanism: 'Deck Building, Worker Placement, Area Control',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic5390975.jpg'
     },
     {
       name: 'Cascadia',
@@ -221,7 +255,6 @@ function seedData() {
       complexity: 1.9, year_published: 2021, designer: 'Randy Flynn',
       publisher: 'Flatout Games', category: 'Animals, Puzzle',
       mechanism: 'Tile Placement, Pattern Building, Set Collection',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic5963300.jpg'
     },
     {
       name: 'Root',
@@ -230,7 +263,6 @@ function seedData() {
       complexity: 3.7, year_published: 2018, designer: 'Cole Wehrle',
       publisher: 'Leder Games', category: 'Animals, Strategy',
       mechanism: 'Area Control, Asymmetric Powers, Engine Building',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic3690975.jpg'
     },
     {
       name: 'Viticulture Essential Edition',
@@ -239,7 +271,6 @@ function seedData() {
       complexity: 2.9, year_published: 2015, designer: 'Jamey Stegmaier, Alan R. Stone',
       publisher: 'Stonemaier Games', category: 'Economic, Agriculture',
       mechanism: 'Worker Placement, Card Drafting, Order Fulfillment',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic2060390.jpg'
     },
     {
       name: 'Clank! Legacy: Acquisitions Incorporated',
@@ -248,7 +279,6 @@ function seedData() {
       complexity: 3.0, year_published: 2019, designer: 'Rob Daviau, Paul Dennen',
       publisher: 'Renegade Game Studios', category: 'Fantasy, Deck Building, Legacy',
       mechanism: 'Deck Building, Push Your Luck, Dice Rolling',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic3721244.jpg'
     },
     {
       name: 'The Quacks of Quedlinburg',
@@ -257,7 +287,6 @@ function seedData() {
       complexity: 2.1, year_published: 2018, designer: 'Wolfgang Warsch',
       publisher: 'Schmidt Spiele', category: 'Medieval, Push Your Luck',
       mechanism: 'Bag Building, Push Your Luck, Set Collection',
-      image_url: 'https://cf.geekdo-images.com/3F5k3F6F8F3F0F2F1F5F4F=/item-pic/VEdV7uPzPbC8mW7M3h3VXJ6nY1s/fit-in/246x300/filters:strip_icc()/pic4101244.jpg'
     }
   ];
 
@@ -267,10 +296,11 @@ function seedData() {
   `);
 
   const insertStmt = db.transaction((game) => {
+    const img = generateImagePlaceholder(game.name, game.year_published, game.category);
     insertGame.run(
       game.name, game.description, game.min_players, game.max_players,
       game.play_time, game.min_age, game.complexity, game.year_published,
-      game.designer, game.publisher, game.category, game.mechanism, game.image_url
+      game.designer, game.publisher, game.category, game.mechanism, img
     );
   });
 
@@ -337,3 +367,4 @@ function seedData() {
 
 initDb();
 module.exports = db;
+module.exports.generateImagePlaceholder = generateImagePlaceholder;

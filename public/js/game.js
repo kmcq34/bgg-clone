@@ -97,10 +97,10 @@ function renderGame(data) {
 
   if (relatedGames && relatedGames.length) {
     document.getElementById('related-games').innerHTML = relatedGames.map(g => `
-      <div class="related-game-card">
+      <a href="/game?id=${g.id}" class="related-game-card" style="text-decoration:none;color:inherit;display:block;">
         <img src="${g.image_url}" alt="${g.name}" onerror="this.style.display='none'">
-        <a href="/game?id=${g.id}">${g.name}</a>
-      </div>
+        <span style="display:block;padding:0.6rem;text-align:center;font-size:0.85rem;font-weight:600;">${g.name}</span>
+      </a>
     `).join('');
   }
 }

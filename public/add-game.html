@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add a Game - BoardGameGeek</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .add-game-form {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--white-card);
+      padding: 20px;
+      border: 2px solid var(--border-light);
+    }
+
+    .add-game-form h2 {
+      font-family: 'Georgia', serif;
+      font-size: 16px;
+      color: var(--text-heading);
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .add-game-form .form-group {
+      margin-bottom: 10px;
+    }
+
+    .add-game-form .form-group label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .add-game-form .form-group input,
+    .add-game-form .form-group textarea {
+      width: 100%;
+      padding: 4px 8px;
+      background: #ffffff;
+      border: 2px inset var(--border-light);
+      color: var(--text-body);
+      font-size: 13px;
+      font-family: 'Trebuchet MS', sans-serif;
+    }
+
+    .add-game-form .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .add-game-form .form-group input:focus,
+    .add-game-form .form-group textarea:focus {
+      outline: none;
+      border-color: var(--xp-blue);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="/" class="logo">BoardGameGeek</a>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/search">Browse</a></li>
+          <li><a href="/add-game">Add Game</a></li>
+          <li id="nav-login"><a href="/login">Sign In</a></li>
+          <li id="nav-user" style="display: none;"><a href="#" id="username-link"></a></li>
+          <li id="nav-logout" style="display: none;"><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+        <form class="search-bar" onsubmit="quickSearch(event)">
+          <input type="text" id="quick-search-input" placeholder="Search games...">
+          <button type="submit">Go</button>
+        </form>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1 class="section-title">Add a Board Game</h1>
+
+      <div class="add-game-form">
+        <div id="form-message" class="error-message" style="display: none;"></div>
+
+        <form id="add-game-form" onsubmit="addGame(event)">
+          <div class="form-group">
+            <label>Game Name *</label>
+            <input type="text" id="game-name" required>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="game-description"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Min Players</label>
+              <input type="number" id="game-min-players" value="1" min="1" max="20">
+            </div>
+            <div class="form-group">
+              <label>Max Players</label>
+              <input type="number" id="game-max-players" value="4" min="1" max="20">
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>Play Time (min)</label>
+              <input type="number" id="game-play-time" value="45" min="5">
+            </div>
+            <div class="form-group">
+              <label>Min Age</label>
+              <input type="number" id="game-min-age" value="8" min="1" max="99">
+            </div>
+            <div class="form-group">
+              <label>Complexity (1-5)</label>
+              <input type="number" id="game-complexity" value="2" min="1" max="5" step="0.1">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Year Published</label>
+              <input type="number" id="game-year" value="2026" min="1900">
+            </div>
+            <div class="form-group">
+              <label>Designer</label>
+              <input type="text" id="game-designer">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Publisher</label>
+              <input type="text" id="game-publisher">
+            </div>
+            <div class="form-group">
+              <label>Category (comma-separated, e.g. Strategy, Fantasy)</label>
+              <input type="text" id="game-category">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Mechanisms (comma-separated, e.g. Deck Building, Worker Placement)</label>
+            <input type="text" id="game-mechanism">
+          </div>
+
+          <div class="form-group">
+            <label>Image URL</label>
+            <input type="text" id="game-image-url" placeholder="https://...">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Add Game</button>
+            <a href="/search" class="btn btn-secondary" style="text-decoration:none;color:white;display:inline-block;">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>BoardGameGeek Clone &copy; 2026</p>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/add-game.js"></script>
+</body>
+</html>
